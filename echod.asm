@@ -15,6 +15,8 @@ section .data
   caught_sigint_msg_len  equ  $-caught_sigint_msg
   startup_msg            db   'Starting echod...', 0x0a
   startup_msg_len        equ  $-startup_msg
+  listen_addr_env        db   'ECHOD_LISTEN_ADDR'
+  listen_addr_env_len    equ  $-listen_addr_env
 
 section .bss
   accept_socket:   resd 1
@@ -24,6 +26,36 @@ section .bss
   socket_address:  resd 2
 
 section .text
+  ;--------------------------------------------------------
+  ; strncmp
+  ;
+  ; args:
+  ;   esi = string 1
+  ;   edi = string 2
+  ;   ecx = length of string 2
+  ; out:
+  ;   eax = 0 if equal, 1 if not
+  ;--------------------------------------------------------
+  strncmp:
+    push  ecx
+    push  edi
+    push  esi
+    cld
+
+    repe   cmpsb
+    jecxz  .equal
+    mov    eax, 1
+
+    .equal:
+      mov   eax, ecx
+      jmp .done
+
+    .done:
+      pop   esi
+      pop   edi
+      pop   ecx
+      ret
+
   ;--------------------------------------------------------
   ; strlen
   ;   returns the length of the given string.
@@ -135,6 +167,14 @@ global _start
     pop   edx
     test  edx, edx
     je    next
+
+    mov   esi, edx
+    mov   edi, listen_addr_env
+    mov   ecx, listen_addr_env_len
+    call  strncmp
+
+    test  eax, eax
+    jne   get_env
 
     mov   edi, edx
     call  strlen
