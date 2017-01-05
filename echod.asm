@@ -158,7 +158,7 @@ next:
   call  sys_signal
 
   ; create a TCP socket and start listening for requests
-  ; on 127.0.0.1 port 5000.
+  ; on 0.0.0.0 port 5000.
 
   ; push the socket syscall arguments on the stack.
   push  dword 6                 ; TCP
@@ -173,7 +173,7 @@ next:
   mov  dword [socket], eax 
 
   ; creaet the sockaddr structure.
-  push  dword 0x0100007F        ; 127.0.0.1
+  push  dword 0x00000000        ; 0.0.0.0
   push  word  0x8813            ; port 5000
   push  word  2                 ; AF_INET
   mov   [socket_address], esp
