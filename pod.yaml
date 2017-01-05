@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: echod
+  labels:
+    app: echod
+spec:
+  containers:
+    - name: echod
+      image: gcr.io/hightowerlabs/echod:0.0.1
+      ports:
+        - name: tcp
+          containerPort: 5000
+      resources:
+        limits:
+          cpu: 0.1
+          memory: "4Mi"
